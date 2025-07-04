@@ -37,7 +37,13 @@ resource "aws_eks_addon" "eks-addons" {
   for_each      = { for idx, addon in var.addons : idx => addon }
   cluster_name  = aws_eks_cluster.eks[0].name
   addon_name    = each.value.name
-  addon_version = "v1.11.4-eksbuild.14"
+ # addon_version = "v1.11.4-eksbuild.14"
+   addon_version = lookup({
+    "coredns"             = "v1.11.4-eksbuild.14",
+    "vpc-cni"             = "v1.19.6-eksbuild.1",
+    "kube-proxy"          = "v1.32.5-eksbuild.2",
+    "aws-ebs-csi-driver"  = "v1.45.0-eksbuild.2"
+  }, each.value, null)
 
   depends_on = [
     aws_eks_node_group.ondemand-node,
